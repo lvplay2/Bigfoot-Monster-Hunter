@@ -65,7 +65,6 @@ public class MainMenuController : MonoBehaviour
 	private void Start()
 	{
 		Debug.Log("MainMenu.Start()");
-		Invoke("ShowRateUs_Later", 0f);
 		MenuItem[] array = items;
 		foreach (MenuItem menuItem in array)
 		{

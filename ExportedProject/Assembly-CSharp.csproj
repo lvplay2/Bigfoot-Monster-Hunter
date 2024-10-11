@@ -88,6 +88,7 @@
      <Compile Include="Assets\Scripts\Assembly-CSharp\Difficult.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\DifficultButtonScript.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\DifficultLevel.cs" />
+     <Compile Include="Assets\Scripts\Assembly-CSharp\DifficultLevelChecker.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\EnvirometSettings.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\FP_Button.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\FP_CameraLook.cs" />

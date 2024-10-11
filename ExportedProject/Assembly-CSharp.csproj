@@ -101,7 +101,6 @@
      <Compile Include="Assets\Scripts\Assembly-CSharp\Footsteps.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\FrameCount.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\GDPR.cs" />
-     <Compile Include="Assets\Scripts\Assembly-CSharp\GameBaner.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\Gradient.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\Hard.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\HeadBob.cs" />
@@ -126,7 +125,6 @@
      <Compile Include="Assets\Scripts\Assembly-CSharp\Monster.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\MonsterBigFoot.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\MonsterPaw.cs" />
-     <Compile Include="Assets\Scripts\Assembly-CSharp\MonsterRake.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\Normal.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\PickUpItem.cs" />
      <Compile Include="Assets\Scripts\Assembly-CSharp\PickUpRay.cs" />

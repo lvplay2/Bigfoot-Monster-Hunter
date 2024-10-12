@@ -42,6 +42,13 @@
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\EventSystemChecker.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\ForcedReset.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\Properties\AssemblyInfo.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\FirstPerson\FirstPersonController.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\FirstPerson\HeadBob.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\FirstPerson\MouseLook.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\FirstPerson\RigidbodyFirstPersonController.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\ThirdPerson\AICharacterControl.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\ThirdPerson\ThirdPersonCharacter.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Characters\ThirdPerson\ThirdPersonUserControl.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\AxisTouchButton.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\ButtonHandler.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\CrossPlatformInputManager.cs" />
@@ -53,6 +60,34 @@
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\TiltInput.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\TouchPad.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\CrossPlatformInput\VirtualInput.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\AfterburnerPhysicsForce.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\ExplosionFireAndDebris.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\ExplosionPhysicsForce.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\Explosive.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\ExtinguishableParticleSystem.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\FireLight.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\Hose.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\ParticleSystemMultiplier.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\SmokeParticles.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Effects\WaterHoseParticles.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\ActivateTrigger.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\AutoMobileShaderSwitch.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\AutoMoveAndRotate.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\CameraRefocus.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\CurveControlledBob.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\DragRigidbody.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\DynamicShadowSettings.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\FOVKick.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\FPSCounter.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\FollowTarget.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\LerpControlledBob.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\ObjectResetter.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\ParticleSystemDestroyer.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\PlatformSpecificContent.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\SimpleMouseRotator.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\SmoothFollow.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\TimedObjectActivator.cs" />
+     <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Utility\TimedObjectDestructor.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Vehicles\Ball\Ball.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Vehicles\Ball\BallUserControl.cs" />
      <Compile Include="Assets\Plugins\Assembly-CSharp-firstpass\UnityStandardAssets\Water\Displace.cs" />
@@ -621,13 +656,13 @@
       <Project>{ebfe490a-8cfe-3112-285e-f9c63366f943}</Project>
       <Name>UnityStore</Name>
     </ProjectReference>
+    <ProjectReference Include="VacuumShaders.TerrainToMesh.csproj">
+      <Project>{64b3e60a-d939-3e45-ee41-8feb5afa6a0e}</Project>
+      <Name>VacuumShaders.TerrainToMesh</Name>
+    </ProjectReference>
     <ProjectReference Include="Unity.Rider.Editor.csproj">
       <Project>{cac42af8-5d56-e803-3304-8e6b2366923f}</Project>
       <Name>Unity.Rider.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="ChannelPurchase.csproj">
-      <Project>{bf706848-18ed-6100-fd96-eea17fdb3dc2}</Project>
-      <Name>ChannelPurchase</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.2D.Sprite.Editor.csproj">
       <Project>{4f583cf8-3914-5fd4-4b67-0f316e5f32a9}</Project>

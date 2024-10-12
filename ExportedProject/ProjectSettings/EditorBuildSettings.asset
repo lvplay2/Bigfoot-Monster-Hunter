@@ -2,13 +2,16 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1045 &1
 EditorBuildSettings:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
+  serializedVersion: 2
   m_Scenes:
   - enabled: 1
     path: Assets/Game/MainMenu.unity
-    guid: 2f9e35cabaa82f04ea008b8b1dbd8df7
+    guid: 5138131120efd794ab672cf34c6afde0
   - enabled: 1
     path: Assets/Game/GamePlay.unity
     guid: 5b2e8bac03b8cbb4c97ecbffcd27d459
+  - enabled: 1
+    path: Assets/Game/Sandbox.unity
+    guid: a1d5dba0425c83a4c855418685961cc1
   m_configObjects: {}

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 public class MonsterBigFoot : Monster
@@ -8,23 +7,19 @@ public class MonsterBigFoot : Monster
 
 	public AudioSource voiceSource;
 
-	public PlaySound monsterSounds;
+	public PlaySound monsterFarSounds;
 
 	public AudioClip nearGnarling;
 
 	public float gnarlingDistance = 15f;
 
-	protected float getoutReactionRange;
-
-	protected float damageForRetreate = 20f;
+	protected float damageForScare = 20f;
 
 	protected float takenDamage;
 
 	protected float strikesForRetreate = 1f;
 
 	protected float strikesMaked;
-
-	protected float decoyLookRange;
 
 	protected StateMachine attackMachine = new StateMachine();
 
@@ -36,45 +31,11 @@ public class MonsterBigFoot : Monster
 
 	protected bool wasFirstScream;
 
-	protected float firstAttackAfter = 90f;
+	protected float forceAttackAfter = 120f;
 
-	protected bool wasFirstAttack;
+	protected bool wasForeceAttack;
 
 	protected bool watchNearFire;
-
-	protected Heals targetHeals;
-
-	protected bool jumpEscapeNoWay;
-
-	protected Vector3 jumpEscapeFinalPos;
-
-	protected JumpAgent jagent;
-
-	protected int trappingLimit = 3;
-
-	protected float trappingTimeout = 60f;
-
-	protected float trappingLittleTimeout = 30f;
-
-	protected int wasTrapedInLastTime;
-
-	protected float timerForMeat;
-
-	protected float minTimedScreamDelay = 180f;
-
-	protected float maxTimedScreamDelay = 240f;
-
-	protected float delayTimedScream;
-
-	protected float lastTimedScreamTime;
-
-	protected float minTimedAttackDelay = 300f;
-
-	protected float maxTimedAttackDelay = 420f;
-
-	protected float delayTimedAttack;
-
-	protected float lastTimedAttackTime;
 
 	private bool isRunAwayNow;
 
@@ -82,288 +43,143 @@ public class MonsterBigFoot : Monster
 
 	private void SetMonsterParameters()
 	{
-		jagent = GetComponent<JumpAgent>();
 		currDiff = Difficult.Instance.GetSelectedLevel();
 		damagePerAnim *= currDiff.monsterMakeDamage;
-		runSpeed = 16f;
+		runSpeed = 10f;
 		walkSpeed = 2.5f;
-		decoyLookRange = 200f;
-		lookRange = 40f;
-		getoutReactionRange = 47f;
-		runAwayRange = 150f;
-		changePosForbidenRadius = 130f;
-		carefulPatrolForbidenRadius = 75f;
-		eatDecoyTime = 120f;
-		minRangeForAttack = 2f;
-		maxRangeForAttack = 3f;
+		runAwayRange = 100f;
+		lookRange = 45f;
 		AgentAnimDriver component = GetComponent<AgentAnimDriver>();
 		component.walk.realSpd = walkSpeed;
 		component.run.realSpd = runSpeed;
-		targetHeals = target.GetComponent<Heals>();
-		wasTrapedInLastTime = 0;
-		timerForMeat = Time.time;
 	}
 
 	protected override void Start()
 	{
-		lastTimedScreamTime = Time.time;
-		delayTimedScream = UnityEngine.Random.Range(minTimedScreamDelay, maxTimedScreamDelay);
-		lastTimedAttackTime = Time.time;
-		delayTimedAttack = UnityEngine.Random.Range(minTimedAttackDelay, maxTimedAttackDelay);
 		firstScreamAfter += Time.time;
-		firstAttackAfter += Time.time;
+		forceAttackAfter += Time.time;
 		SetMonsterParameters();
 		SelectSpawnPoint();
 		base.Start();
 		stateMachine.isLoggingEnabled = true;
 		stateMachine.logName = base.gameObject.name;
 		StateMachine.State stateById = stateMachine.GetStateById("idlePatrolling");
-		stateById.AddLink("carefulPatrolling", IdlePatrolling_WalkPatrolling);
-		stateById.AddLink("runToTarget", Common_Aggr);
-		stateById.AddLink("jumpEscaping", IsMonsterScared);
-		StateMachine.State stateById2 = stateMachine.GetStateById("carefulPatrolling");
-		stateById2.Update = delegate
-		{
-			if (PlayerPrefs.GetInt("WatchBF") == 1)
-			{
-				if (!TargetInRadius(100f) && Time.time > lastTimedScreamTime + delayTimedScream)
-				{
-					Debug.LogWarning("TimedScream " + Time.time);
-					monsterSounds.PlayRand("farScream");
-					lastTimedScreamTime = Time.time;
-					delayTimedScream = UnityEngine.Random.Range(minTimedScreamDelay, maxTimedScreamDelay);
-				}
-				if (!TargetInRadius(100f) && Time.time > lastTimedAttackTime + delayTimedAttack)
-				{
-					delayTimedAttack = UnityEngine.Random.Range(minTimedAttackDelay, maxTimedAttackDelay);
-					Debug.LogWarning("TimedAttack " + Time.time);
-					stateMachine.SwitchStateTo(stateMachine.GetStateById("fastFindTarget"));
-				}
-			}
-		};
+		stateById.AddLink("walkPatrolling", IdlePatrolling_WalkPatrolling);
+		stateById.AddLink("watchTarget", Patrolling_RunToTarget);
+		stateById.AddLink("runAwayFromTarget", IsMonsterScared);
+		StateMachine.State stateById2 = stateMachine.GetStateById("walkPatrolling");
 		stateById2.AddLink("idlePatrolling", WalkPatrolling_IdlePatrolling);
-		stateById2.AddLink("runToTarget", Common_Aggr);
-		stateById2.AddLink("jumpEscaping", IsMonsterScared);
+		stateById2.AddLink("watchTarget", Patrolling_RunToTarget);
+		stateById2.AddLink("runAwayFromTarget", IsMonsterScared);
 		stateById2.AddLink("gotoDecoy", delegate
 		{
-			if (Time.time >= timerForMeat)
-			{
-				Transform nearestDecoyInRange3 = GetNearestDecoyInRange(decoyLookRange);
-				if ((bool)nearestDecoyInRange3)
-				{
-					currDecoy = nearestDecoyInRange3;
-				}
-				return nearestDecoyInRange3 != null;
-			}
-			return false;
-		});
-		StateMachine.State stateById3 = stateMachine.GetStateById("goAwayFromTarget");
-		stateById3.AddLink("carefulPatrolling", () => !TransformInRadius(target, runAwayRange));
-		stateById3.AddLink("runToTarget", Common_Aggr);
-		stateById3.AddLink("jumpEscaping", IsMonsterScared);
-		stateById3.AddLink("gotoDecoy", delegate
-		{
-			Transform nearestDecoyInRange2 = GetNearestDecoyInRange(decoyLookRange);
+			Transform nearestDecoyInRange2 = GetNearestDecoyInRange(lookRange);
 			if ((bool)nearestDecoyInRange2)
 			{
 				currDecoy = nearestDecoyInRange2;
 			}
 			return nearestDecoyInRange2 != null;
 		});
-		StateMachine.State stateById4 = stateMachine.GetStateById("runToTarget");
-		stateById4.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById4.OnEnter, (StateMachine.OnEvent)delegate
+		StateMachine.State stateById3 = stateMachine.GetStateById("runToTarget");
+		stateById3.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById3.OnEnter, (StateMachine.OnEvent)delegate
 		{
 			isAttackState = true;
 			PlayerPrefs.SetInt("WatchBF", 1);
-			lastTimedScreamTime = Time.time;
-			lastTimedAttackTime = Time.time;
+		});
+		stateById3.OnExit = (StateMachine.OnEvent)Delegate.Combine(stateById3.OnExit, (StateMachine.OnEvent)delegate
+		{
+			isAttackState = false;
+		});
+		stateById3.AddLink("attackTarget", RunToTarget_AttackTarget);
+		stateById3.AddLink("runAwayFromTarget", MonsterRetreate);
+		StateMachine.State stateById4 = stateMachine.GetStateById("attackTarget");
+		stateById4.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById4.OnEnter, (StateMachine.OnEvent)delegate
+		{
+			isAttackState = true;
 		});
 		stateById4.OnExit = (StateMachine.OnEvent)Delegate.Combine(stateById4.OnExit, (StateMachine.OnEvent)delegate
 		{
 			isAttackState = false;
 		});
-		stateById4.AddLink("attackTarget", RunToTarget_AttackTarget);
-		stateById4.AddLink("jumpEscaping", MonsterRetreate);
-		StateMachine.State stateById5 = stateMachine.GetStateById("attackTarget");
+		stateById4.AddLink("runToTarget", AttackTarget_RunToTarget);
+		stateById4.AddLink("runAwayFromTarget", MonsterRetreate);
+		StateMachine.State stateById5 = stateMachine.GetStateById("runAwayFromTarget");
 		stateById5.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById5.OnEnter, (StateMachine.OnEvent)delegate
 		{
-			isAttackState = true;
+			isRunAwayNow = true;
+			ResetMonsterScare();
 		});
+		stateById5.OnExit = RunAwayFromTarget_OnExit;
 		stateById5.OnExit = (StateMachine.OnEvent)Delegate.Combine(stateById5.OnExit, (StateMachine.OnEvent)delegate
 		{
-			isAttackState = false;
-		});
-		stateById5.AddLink("runToTarget", AttackTarget_RunToTarget);
-		stateById5.AddLink("jumpEscaping", MonsterRetreate);
-		StateMachine.State stateById6 = stateMachine.GetStateById("runAwayFromTarget");
-		stateById6.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById6.OnEnter, (StateMachine.OnEvent)delegate
-		{
-			isRunAwayNow = true;
-		});
-		stateById6.OnExit = RunAwayFromTarget_OnExit;
-		stateById6.OnExit = (StateMachine.OnEvent)Delegate.Combine(stateById6.OnExit, (StateMachine.OnEvent)delegate
-		{
 			isRunAwayNow = false;
+			ResetMonsterScare();
 		});
-		stateById6.AddLink("waitForPlayerRess", () => !TransformInRadius(target, runAwayRange) && IsTargetDead());
-		stateById6.AddLink("changePosByTarget", () => !TransformInRadius(target, runAwayRange));
-		stateById6.AddLink("runAwayFromTarget", RunAwayFromTarget_RunAwayFromTarget);
-		StateMachine.State stateById7 = stateMachine.GetStateById("waitForPlayerRess");
-		stateById7.AddLink("carefulPatrolling", () => !IsTargetDead());
-		StateMachine.State state = new StateMachine.State("fastFindTarget");
-		stateMachine.AddState(state);
-		state.OnEnter = delegate
+		stateById5.AddLink("changePosByTarget", RunAwayFromTarget_HuntTarget);
+		stateById5.AddLink("runAwayFromTarget", RunAwayFromTarget_RunAwayFromTarget);
+		StateMachine.State stateById6 = stateMachine.GetStateById("huntTarget");
+		stateById6.AddLink("watchTarget", HuntTarget_RunToTarget);
+		stateById6.AddLink("huntTarget", HuntTarget_HuntTarget);
+		stateById6.AddLink("runAwayFromTarget", IsMonsterScared);
+		stateById6.AddLink("gotoDecoy", delegate
 		{
-			if (!agent.enabled)
+			Transform nearestDecoyInRange = GetNearestDecoyInRange(lookRange);
+			if ((bool)nearestDecoyInRange)
 			{
-				agent.enabled = true;
+				currDecoy = nearestDecoyInRange;
 			}
-			agent.speed = runSpeed;
-		};
-		state.Update = delegate
+			return nearestDecoyInRange != null;
+		});
+		StateMachine.State stateById7 = stateMachine.GetStateById("watchTarget");
+		stateById7.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById7.OnEnter, (StateMachine.OnEvent)delegate
 		{
-			agent.destination = target.position;
-		};
-		state.AddLink("runToTarget", Common_Aggr);
+			takenDamage = 0f;
+			if (UnityEngine.Random.Range(0, 3) == 0 || PlayerPrefs.GetInt("WatchBF") == 0)
+			{
+				monsterFarSounds.PlayRand("farScream");
+			}
+		});
+		stateById7.AddLink("runAwayFromTarget", IsMonsterScared);
+		stateById7.AddLink("runToTarget", () => TargetInRadius(lookRange - 5f) || !TargetInRadius(lookRange + 5f) || Time.time > watchBegin + watchTime || TakedAnyDamage());
 		StateMachine.State stateById8 = stateMachine.GetStateById("gotoDecoy");
-		stateById8.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById8.OnEnter, (StateMachine.OnEvent)delegate
-		{
-			if (wasTrapedInLastTime == 0)
-			{
-				Debug.LogWarning("MEAT YEAH!!!");
-			}
-		});
-		stateById8.AddLink("attackTarget", Common_Aggr);
-		stateById8.AddLink("eatDecoy", () => TransformInRadius(currDecoy, 0.15f));
-		stateById8.AddLink("idlePatrolling", () => currDecoy == null && Vector3.Distance(agent.destination, thisTransform.position) <= 20f);
+		stateById8.AddLink("attackTarget", () => TargetInRadius(lookRange / 2f));
+		stateById8.AddLink("eatDecoy", () => TransformInRadius(currDecoy, 0.1f) ? true : false);
+		stateById8.AddLink("runAwayFromTarget", () => IsMonsterScared());
 		StateMachine.State stateById9 = stateMachine.GetStateById("eatDecoy");
-		stateById9.AddLink("attackTarget", Common_Aggr);
-		stateById9.AddLink("carefulPatrolling", () => Time.time > eatDecoyStart + eatDecoyTime);
+		stateById9.AddLink("attackTarget", () => TargetInRadius(lookRange / 2f));
+		stateById9.AddLink("runAwayFromTarget", () => IsMonsterScared());
+		stateById9.AddLink("walkPatrolling", () => Time.time > eatDecoyStart + eatDecoyTime);
 		StateMachine.State stateById10 = stateMachine.GetStateById("frozen");
 		stateById10.OnEnter = (StateMachine.OnEvent)Delegate.Combine(stateById10.OnEnter, (StateMachine.OnEvent)delegate
 		{
-			lastTimedScreamTime = Time.time;
-			lastTimedAttackTime = Time.time;
-			Transform nearestDecoyInRange = GetNearestDecoyInRange(2f);
-			if (nearestDecoyInRange != null)
+			if (TransformInRadius(currDecoy, 2f))
 			{
-				UnityEngine.Object.Destroy(nearestDecoyInRange.gameObject);
-				wasTrapedInLastTime++;
-				if (wasTrapedInLastTime >= trappingLimit)
-				{
-					Debug.LogWarning("Pain! NO MORE meat!");
-					wasTrapedInLastTime = 0;
-					timerForMeat = Time.time + trappingTimeout;
-				}
-				else
-				{
-					Debug.LogWarning("Pain! WTF?");
-					if (Time.time >= timerForMeat)
-					{
-						timerForMeat = Time.time + trappingLittleTimeout;
-					}
-				}
+				UnityEngine.Object.Destroy(currDecoy.gameObject);
 			}
 			if (TargetInRadius(lookRange / 2f))
 			{
-				monsterSounds.PlayRand("trollScream");
+				monsterFarSounds.PlayRand("trollScream");
 			}
 			else
 			{
-				monsterSounds.PlayRand("painScream");
+				monsterFarSounds.PlayRand("painScream");
 			}
 		});
-		stateById10.AddLink("runToTarget", () => Time.time > freezeBegin + freezeMax && TargetInRadius(lookRange));
-		stateById10.AddLink("carefulPatrolling", () => Time.time > freezeBegin + freezeMax && !TargetInRadius(lookRange));
+		stateById10.AddLink("runAwayFromTarget", () => Time.time > freezeBegin + freezeMax && TargetInRadius(lookRange));
+		stateById10.AddLink("walkPatrolling", () => Time.time > freezeBegin + freezeMax && !TargetInRadius(lookRange));
 		StateMachine.State stateById11 = stateMachine.GetStateById("changePosByTarget");
 		stateById11.AddLink("runAwayFromTarget", () => TransformInRadius(target, lookRange));
-		stateById11.AddLink("carefulPatrolling", () => changePosNoPosSelected || PositionInRadius(changePosSelectedPos, 1f));
-		StateMachine.State state2 = new StateMachine.State("jumpEscaping");
-		stateMachine.AddState(state2);
-		state2.OnEnter = delegate
-		{
-			ArrayList arrayList = new ArrayList();
-			ArrayList arrayList2 = new ArrayList();
-			Vector3 position = target.position;
-			RaycastHit[] array = Physics.SphereCastAll(position, 40f, Vector3.up, 0f, LayerMask.GetMask("CastShadows"), QueryTriggerInteraction.UseGlobal);
-			Debug.Log("SphereCastAll");
-			Vector3 position2 = target.position;
-			Vector3 forward = target.forward;
-			if (array != null && array.Length > 0)
-			{
-				RaycastHit[] array2 = array;
-				for (int i = 0; i < array2.Length; i++)
-				{
-					RaycastHit raycastHit = array2[i];
-					GameObject gameObject = raycastHit.collider.gameObject;
-					Transform transform = raycastHit.collider.transform;
-					Vector3 position3 = transform.position;
-					if (gameObject.tag == "Tree")
-					{
-						if (JackUtils.PointInAngle(position2, forward, 20f, position3) && Vector3.Distance(position2, position3) > 10f)
-						{
-							arrayList.Add(transform);
-						}
-						arrayList2.Add(transform);
-					}
-				}
-			}
-			Transform transform2 = Unical.Get("t4sample").transform;
-			if (arrayList2.Count >= 3 && arrayList.Count >= 1)
-			{
-				Transform transform3 = null;
-				float num = 100f;
-				foreach (Transform item in arrayList)
-				{
-					float num2 = Vector3.Distance(item.position, thisTransform.position);
-					if (num2 < num)
-					{
-						transform3 = item;
-						num = num2;
-					}
-				}
-				arrayList2.Remove(transform3);
-				Vector3 vector = transform3.TransformPoint(transform2.Find("J1").localPosition);
-				int index = UnityEngine.Random.Range(0, arrayList2.Count);
-				Vector3 vector2 = ((Transform)arrayList2[index]).TransformPoint(transform2.Find("J2").localPosition);
-				arrayList2.RemoveAt(index);
-				index = UnityEngine.Random.Range(0, arrayList2.Count);
-				Vector3 vector3 = ((Transform)arrayList2[index]).TransformPoint(transform2.Find("J3").localPosition);
-				arrayList2.RemoveAt(index);
-				agent.enabled = false;
-				jumpEscapeFinalPos = GetRunAwayPoint();
-				jagent.jumpPoints = new Vector3[4] { vector, vector2, vector3, jumpEscapeFinalPos };
-				jagent.enabled = true;
-				jumpEscapeNoWay = false;
-			}
-			else
-			{
-				jumpEscapeNoWay = true;
-			}
-		};
-		state2.Update = delegate
-		{
-		};
-		state2.OnExit = delegate
-		{
-			lastTimedScreamTime = Time.time;
-			lastTimedAttackTime = Time.time;
-			agent.enabled = true;
-			jagent.enabled = false;
-		};
-		state2.AddLink("runAwayFromTarget", () => jumpEscapeNoWay);
-		state2.AddLink("waitForPlayerRess", () => PositionInRadius(jumpEscapeFinalPos, 1f) && IsTargetDead());
-		state2.AddLink("changePosByTarget", () => PositionInRadius(jumpEscapeFinalPos, 1f));
+		stateById11.AddLink("huntTarget", () => PositionInRadius(changePosSelectedPos, 1f) || changePosNoPosSelected);
 		stateMachine.SwitchStateTo(stateById2);
-		StateMachine.State state3 = new StateMachine.State("waitForAttack");
-		attackMachine.AddState(state3);
-		state3.OnEnter = WaitForAttack_OnEnter;
-		state3.AddLink("attackingNow", () => MonsterCanAttack());
-		StateMachine.State state4 = new StateMachine.State("attackingNow");
-		attackMachine.AddState(state4);
-		state4.OnEnter = AttackingNow_OnEnter;
-		state4.AddLink("waitForAttack", () => !MonsterCanAttack());
-		attackMachine.SwitchStateTo(state3);
+		StateMachine.State state = new StateMachine.State("waitForAttack");
+		attackMachine.AddState(state);
+		state.OnEnter = WaitForAttack_OnEnter;
+		state.AddLink("attackingNow", () => MonsterCanAttack());
+		StateMachine.State state2 = new StateMachine.State("attackingNow");
+		attackMachine.AddState(state2);
+		state2.OnEnter = AttackingNow_OnEnter;
+		state2.AddLink("waitForAttack", () => !MonsterCanAttack());
+		attackMachine.SwitchStateTo(state);
 		SetAnimDelegates();
 		paws = GetComponentsInChildren<MonsterPaw>();
 	}
@@ -433,20 +249,25 @@ public class MonsterBigFoot : Monster
 
 	private void AttackTarget_OnExit()
 	{
+		strikesMaked = 0f;
+		takenDamage = 0f;
 	}
 
 	private void RunAwayFromTarget_OnExit()
 	{
+		strikesMaked = 0f;
+		takenDamage = 0f;
+		watchNearFire = false;
 	}
 
 	private bool RunAwayFromTarget_HuntTarget()
 	{
-		return !TransformInRadius(target, runAwayRange);
+		return RunAwayFromTarget_IdlePatrolling();
 	}
 
 	private bool HuntTarget_RunToTarget()
 	{
-		return Common_Aggr();
+		return Patrolling_RunToTarget();
 	}
 
 	private bool HuntTarget_HuntTarget()
@@ -516,11 +337,10 @@ public class MonsterBigFoot : Monster
 		return false;
 	}
 
-	private bool Common_Aggr()
+	private bool Patrolling_RunToTarget()
 	{
-		if (TransformInRadius(target, lookRange) || TakedAnyDamage())
+		if ((thisTransform.position - target.position).sqrMagnitude < lookRange * lookRange)
 		{
-			monsterSounds.PlayRand("aggrScream");
 			return true;
 		}
 		return false;
@@ -528,26 +348,17 @@ public class MonsterBigFoot : Monster
 
 	private bool MonsterRetreate()
 	{
-		bool flag = IsMonsterScared();
-		if (takenDamage >= damageForRetreate || flag || IsTargetDead())
+		if (IsMonsterScared() || strikesMaked >= strikesForRetreate)
 		{
-			ResetDamage();
-			ResetMonsterScare();
 			return true;
 		}
 		return false;
 	}
 
-	private bool IsTargetDead()
-	{
-		return targetHeals.hp <= 0f;
-	}
-
 	private bool IsMonsterScared()
 	{
-		if (watchNearFire)
+		if (takenDamage >= damageForScare || watchNearFire)
 		{
-			ResetMonsterScare();
 			return true;
 		}
 		return false;
@@ -556,10 +367,6 @@ public class MonsterBigFoot : Monster
 	private void ResetMonsterScare()
 	{
 		watchNearFire = false;
-	}
-
-	private void ResetDamage()
-	{
 		takenDamage = 0f;
 	}
 
@@ -567,7 +374,6 @@ public class MonsterBigFoot : Monster
 	{
 		if (takenDamage > 0f)
 		{
-			ResetDamage();
 			return true;
 		}
 		return false;
@@ -583,36 +389,13 @@ public class MonsterBigFoot : Monster
 		{
 			Debug.Log("!currDiff");
 		}
-		bool flag = false;
-		if (damage >= heals.hp && damager != null && damager.GetComponent<TrapInstance>() != null)
-		{
-			flag = true;
-		}
-		bool flag2 = false;
-		StateMachine.State currState = stateMachine.GetCurrState();
-		if (damage >= heals.hp && currState != null && currState.id == "jumpEscaping")
-		{
-			flag2 = true;
-		}
-		if (!flag && !flag2)
-		{
-			base.TakeDamage(damage, damager);
-		}
+		base.TakeDamage(damage, damager);
 	}
 
 	public override void OnNotLethalStrike(float damage, Transform damager)
 	{
 		base.OnNotLethalStrike(damage, damager);
-		StateMachine.State currState = stateMachine.GetCurrState();
-		bool flag = damager != null && damager.gameObject.GetComponent<TrapInstance>() != null;
-		bool flag2 = currState.id == "jumpEscaping";
-		bool flag3 = currState.id == "changePosByTarget";
-		bool flag4 = currState.id == "runAwayFromTarget";
-		bool flag5 = currState.id == "frozen";
-		if (!flag4 && !flag5 && !flag3 && !flag2 && !flag)
-		{
-			takenDamage += damage;
-		}
+		takenDamage += damage;
 	}
 
 	public override void Die()
@@ -624,21 +407,33 @@ public class MonsterBigFoot : Monster
 
 	private void FixedUpdate()
 	{
-		StateMachine.State currState = stateMachine.GetCurrState();
 		if (PlayerPrefs.GetInt("WatchBF") == 0)
 		{
-			if (Time.time > firstAttackAfter && !wasFirstAttack)
+			if (Time.time > forceAttackAfter && !wasForeceAttack)
 			{
 				Debug.Log("First play -- force attack!" + Time.time);
-				stateMachine.SwitchStateTo(stateMachine.GetStateById("fastFindTarget"));
-				wasFirstAttack = true;
+				stateMachine.SwitchStateTo(stateMachine.GetStateById("runToTarget"));
+				wasForeceAttack = true;
 			}
 			if (Time.time > firstScreamAfter && !wasFirstScream)
 			{
 				Debug.Log("First play -- scream!" + Time.time);
-				monsterSounds.PlayRand("farScream");
+				monsterFarSounds.PlayRand("farScream");
 				wasFirstScream = true;
 			}
+		}
+		if ((target.position - thisTransform.position).sqrMagnitude < gnarlingDistance * gnarlingDistance)
+		{
+			if (!voiceSource.isPlaying)
+			{
+				voiceSource.clip = nearGnarling;
+				voiceSource.loop = true;
+				voiceSource.Play();
+			}
+		}
+		else if (voiceSource.isPlaying)
+		{
+			voiceSource.Stop();
 		}
 	}
 
@@ -650,14 +445,6 @@ public class MonsterBigFoot : Monster
 
 	public override void ScareByRocket()
 	{
-		StateMachine.State currState = stateMachine.GetCurrState();
-		bool flag = currState.id == "jumpEscaping";
-		bool flag2 = currState.id == "changePosByTarget";
-		bool flag3 = currState.id == "runAwayFromTarget";
-		bool flag4 = currState.id == "frozen";
-		if (!flag3 && !flag4 && !flag2 && !flag)
-		{
-			watchNearFire = true;
-		}
+		watchNearFire = true;
 	}
 }

@@ -1,9 +1,7 @@
 fileFormatVersion: 2
 guid: 5b2e8bac03b8cbb4c97ecbffcd27d459
-timeCreated: 1728579626
-licenseType: Free
 DefaultImporter:
   externalObjects: {}
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+  userData: 
+  assetBundleName: gameplay
+  assetBundleVariant: 

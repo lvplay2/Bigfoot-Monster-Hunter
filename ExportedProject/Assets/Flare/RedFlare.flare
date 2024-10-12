@@ -7,7 +7,7 @@ Flare:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: RedFlare
-  m_FlareTexture: {fileID: 2800000, guid: f263be2e0f45c46489762d994b771c5f, type: 3}
+  m_FlareTexture: {fileID: 2800000, guid: 43ca5d9b8550b154f97a49ce1e92d962, type: 3}
   m_TextureLayout: 1
   m_Elements:
   - m_ImageIndex: 9

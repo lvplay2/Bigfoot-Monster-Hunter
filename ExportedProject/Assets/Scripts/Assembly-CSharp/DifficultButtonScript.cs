@@ -29,8 +29,18 @@ public class DifficultButtonScript : MonoBehaviour
 
 	public void CheckUnlock()
 	{
+		if ((bool)lockObj)
+		{
+			if (IsPrefUnlocked())
+			{
 				lockObj.SetActive(false);
+			}
+			else
+			{
+				lockObj.SetActive(true);
+			}
 		}
+	}
 
 	private void SetButtonToggled(bool toggled)
 	{

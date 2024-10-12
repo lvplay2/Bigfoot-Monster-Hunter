@@ -237,7 +237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &18
 GameObject:
   m_ObjectHideFlags: 0
@@ -3061,7 +3061,6 @@ MonoBehaviour:
   - name: Loading
     gameObj: {fileID: 14}
   GamePlayScene: GamePlay
-  SandboxScene: Sandbox
 --- !u!114 &247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4309,7 +4308,6 @@ GameObject:
   - component: {fileID: 1315232607}
   - component: {fileID: 1315232610}
   - component: {fileID: 1315232609}
-  - component: {fileID: 1315232608}
   m_Layer: 5
   m_Name: txtNotice
   m_TagString: Untagged
@@ -4331,39 +4329,11 @@ RectTransform:
   m_Father: {fileID: 155}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 201, y: 48}
-  m_SizeDelta: {x: -78, y: 1000}
+  m_AnchoredPosition: {x: -199, y: 127}
+  m_SizeDelta: {x: 722, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1315232608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1315232606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 3
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 240}
-          m_MethodName: OnClickSandbox
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: MainMenu
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!114 &1315232609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4396,12 +4366,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'This build is FREE.
-
-    If you paid a third party service
-
-    for this,
-    YOU HAVE BEEN SCAMMED!'
+  m_Text: "This unofficial build aims in adding\nnew features and fixing bugs that
+    \nOneTonGames was never able to fix.\nIf you find a bug, please report it\nin
+    the GitHub repository.\n\nThis build is FREE.\nIf you paid a third party service\nfor
+    this, YOU HAVE BEEN SCAMMED!"
 --- !u!222 &1315232610
 CanvasRenderer:
   m_ObjectHideFlags: 0

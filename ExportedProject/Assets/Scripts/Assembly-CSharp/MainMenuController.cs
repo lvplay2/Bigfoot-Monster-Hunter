@@ -41,8 +41,6 @@ public class MainMenuController : MonoBehaviour
 
 	public string GamePlayScene = "GamePlay";
 
-    public string SandboxScene = "Sandbox";
-
 	private bool isBusy;
 
 	private MenuItem curr;

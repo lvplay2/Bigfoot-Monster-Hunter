@@ -656,10 +656,6 @@
       <Project>{ebfe490a-8cfe-3112-285e-f9c63366f943}</Project>
       <Name>UnityStore</Name>
     </ProjectReference>
-    <ProjectReference Include="VacuumShaders.TerrainToMesh.csproj">
-      <Project>{64b3e60a-d939-3e45-ee41-8feb5afa6a0e}</Project>
-      <Name>VacuumShaders.TerrainToMesh</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.Rider.Editor.csproj">
       <Project>{cac42af8-5d56-e803-3304-8e6b2366923f}</Project>
       <Name>Unity.Rider.Editor</Name>
@@ -671,6 +667,10 @@
     <ProjectReference Include="Unity.2D.Tilemap.Editor.csproj">
       <Project>{10d946be-a95e-dfaa-daee-ef8ca75422d1}</Project>
       <Name>Unity.2D.Tilemap.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="VacuumShaders.TerrainToMesh.csproj">
+      <Project>{64b3e60a-d939-3e45-ee41-8feb5afa6a0e}</Project>
+      <Name>VacuumShaders.TerrainToMesh</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VisualStudio.Editor.csproj">
       <Project>{5f0025f8-244a-31ef-dee8-d6c227e71c0a}</Project>

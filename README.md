@@ -1,7 +1,7 @@
 # Bigfoot Monster Hunter
 A decompilation of Bigfoot Monster Hunter, made with [AssetRipper](https://github.com/AssetRipper/AssetRipper).
 
-Editor version: 2019 (I had to migrate the project to the latest 2017 version to avoid compiler errors).
+Editor version: 2019 (I had to migrate the project to the latest 2019 version to avoid compiler errors).
 
 This unofficial build aims in adding new features and fixing bugs that OneTonGames was never able to fix.
 If you find a bug, please report it in the GitHub repository.
